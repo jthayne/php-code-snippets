@@ -8,29 +8,30 @@ class stripMysqli extends mysqli
         $skipTillResetDouble = false;
         $reachedFirst = false;
 
-        $c = str_split($query);
+        $query = trim($query);
+        $charList = str_split($query);
 
-        $n = count($c);
+        $queryLength = count($charList);
         $spCount = 0;
-        for ($x=0; $x < $n; $x++) {
-            switch ($c[$x]) {
+        for ($loopCount = 0; $loopCount < $queryLength; $loopCount++) {
+            switch ($charList[$loopCount]) {
             case PHP_EOL:
             case "\r":
             case "\n":
                 if ($skipTillResetSingle == false && $skipTillResetDouble == false)
-                    unset($c[$x]);
+                    unset($charList[$loopCount]);
                 break;
             case ' ':
                 if ($skipTillResetSingle == false && $skipTillResetDouble == false) {
                     if ($reachedFirst)
-                        unset($c[$x]);
+                        unset($charList[$loopCount]);
                     else
                         $reachedFirst = true;
                 }
                 break;
             case '\\':
                 $reachedFirst = false;
-                $x++;
+                $loopCount++;
                 break;
             case '\'':
                 $reachedFirst = false;
@@ -52,7 +53,7 @@ class stripMysqli extends mysqli
             }
         }
 
-        $q = implode('', $c);
+        $query = implode('', $charList);
 
 
         $result = parent::query($query);
